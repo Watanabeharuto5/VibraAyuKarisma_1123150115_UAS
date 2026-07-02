@@ -1,4 +1,4 @@
-# 💰 Kantong Ku — Aplikasi Dompet Digital Kampus
+ — Aplikasi Dompet Digital Kampus
 
 | Identitas       | Detail                                      |
 | --------------- | ------------------------------------------- |
@@ -15,7 +15,7 @@ Aplikasi dompet digital kampus yang terintegrasi dengan sistem pembayaran antar-
 
 ## 🏛️ Arsitektur: Clean Architecture
 
-Proyek **Kantong Ku** menggunakan pola **Clean Architecture** dengan pemisahan tanggung jawab yang tegas antara tiga lapisan utama, ditambah lapisan `core` untuk utilitas bersama.
+Proyek **Emoney_** menggunakan pola **Clean Architecture** dengan pemisahan tanggung jawab yang tegas antara tiga lapisan utama, ditambah lapisan `core` untuk utilitas bersama.
 
 ### Prinsip Utama
 
@@ -285,7 +285,7 @@ flutter run
 
 - **[Aplikasi Kantong Ku](https://github.com/Watanabeharuto5/VibraAyuKarisma_1123150115_UAS.git)** — Aplikasi Emoney Kantong Ku
 
-- **[Link Presentasi Youtube](https://youtube.com/)** — Presentasi Youtube Fibra Cuantek
+- **[Link Presentasi Youtube](https://youtube.com/)** — Presentasi Youtube Fibra Cuantek _ otwwww
 
 # UI Aplikasi Dompet ku & K-Pop Albums
 
@@ -293,8 +293,6 @@ flutter run
 
  Tampilan 1
 <p align="center">
-  <img src="assets/images/kantong1.png" width="200"/>
-  <img src="assets/images/kantong2.png" width="200"/>
-  <img src="assets/images/kantong3.png" width="200"/>
+
 
 </p>
