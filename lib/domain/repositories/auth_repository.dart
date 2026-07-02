@@ -11,5 +11,7 @@ abstract class AuthRepository {
   Future<UserEntity?> getSavedUser();
   Future<void> setAuthVerified(bool verified);
   Future<bool> isAuthVerified();
+  Future<void> saveBiometricEnabled(bool enabled);
+  Future<bool> isBiometricEnabled();
   Future<void> restoreApiToken();
 }

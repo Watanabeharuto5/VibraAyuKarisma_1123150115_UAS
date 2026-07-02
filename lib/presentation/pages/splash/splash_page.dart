@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../core/services/deeplink_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_logo.dart';
@@ -15,10 +18,39 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  bool _showBiometricRetry = false;
+
   @override
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(AuthCheckRequested());
+  }
+
+  Future<void> _authenticateBiometrics(AuthState state) async {
+    final enabled = await sl<AuthRepository>().isBiometricEnabled();
+    if (enabled) {
+      final authenticated = await BiometricService.authenticate();
+      if (authenticated) {
+        _proceedToApp(state);
+      } else {
+        setState(() {
+          _showBiometricRetry = true;
+        });
+      }
+    } else {
+      _proceedToApp(state);
+    }
+  }
+
+  void _proceedToApp(AuthState state) {
+    if (state is AuthAuthenticated) {
+      final pending = DeeplinkService.consumePending();
+      if (pending != null) {
+        context.go('/pay', extra: pending);
+      } else {
+        context.go('/home');
+      }
+    }
   }
 
   @override
@@ -26,14 +58,7 @@ class _SplashPageState extends State<SplashPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          // Cek apakah ada deeplink payment yang menunggu (cold-start via deeplink).
-          // Jika ada, langsung ke halaman konfirmasi. Jika tidak, ke home.
-          final pending = DeeplinkService.consumePending();
-          if (pending != null) {
-            context.go('/pay', extra: pending);
-          } else {
-            context.go('/home');
-          }
+          _authenticateBiometrics(state);
         } else if (state is AuthUnauthenticated) {
           // Stay on splash to show welcome
         }
@@ -99,20 +124,64 @@ class _SplashPageState extends State<SplashPage> {
                         ),
                       ),
                       const Spacer(),
-                      Column(
-                        children: [
-                          AppButton(
-                            label: 'Buat Akun Baru',
-                            variant: AppButtonVariant.white,
-                            onPressed: () => context.push('/register'),
-                          ),
-                          const SizedBox(height: 11),
-                          AppButton(
-                            label: 'Masuk ke Akun',
-                            variant: AppButtonVariant.outlineWhite,
-                            onPressed: () => context.push('/login'),
-                          ),
-                        ],
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          if (state is AuthUnauthenticated) {
+                            return Column(
+                              children: [
+                                AppButton(
+                                  label: 'Buat Akun Baru',
+                                  variant: AppButtonVariant.white,
+                                  onPressed: () => context.push('/register'),
+                                ),
+                                const SizedBox(height: 11),
+                                AppButton(
+                                  label: 'Masuk ke Akun',
+                                  variant: AppButtonVariant.outlineWhite,
+                                  onPressed: () => context.push('/login'),
+                                ),
+                              ],
+                            );
+                          } else if (state is AuthAuthenticated && _showBiometricRetry) {
+                            return Column(
+                              children: [
+                                const Text(
+                                  'Autentikasi Diperlukan',
+                                  style: TextStyle(
+                                    fontFamily: 'PlusJakartaSans',
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Gunakan sidik jari Anda untuk masuk ke aplikasi.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'PlusJakartaSans',
+                                    color: Colors.white70,
+                                    fontSize: 13.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                AppButton(
+                                  label: 'Gunakan Sidik Jari',
+                                  variant: AppButtonVariant.white,
+                                  onPressed: () => _authenticateBiometrics(state),
+                                ),
+                              ],
+                            );
+                          } else {
+                            // Tampilkan loading spinner saat check status atau sedang meminta sidik jari
+                            return const SizedBox(
+                              height: 100,
+                              child: Center(
+                                child: CircularProgressIndicator(color: Colors.white),
+                              ),
+                            );
+                          }
+                        },
                       ),
                       const SizedBox(height: 30),
                     ],

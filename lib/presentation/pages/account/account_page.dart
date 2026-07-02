@@ -1,14 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../injection/injection_container.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../widgets/app_avatar.dart';
 import '../../widgets/app_badge.dart';
 import '../../widgets/feature_icon.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  bool _biometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricSetting();
+  }
+
+  Future<void> _loadBiometricSetting() async {
+    final enabled = await sl<AuthRepository>().isBiometricEnabled();
+    if (mounted) {
+      setState(() {
+        _biometricEnabled = enabled;
+      });
+    }
+  }
+
+  Future<void> _toggleBiometric(bool enable) async {
+    if (enable) {
+      // Verifikasi biometrik terlebih dahulu sebelum mengaktifkan
+      final authenticated = await BiometricService.authenticate();
+      if (authenticated) {
+        await sl<AuthRepository>().saveBiometricEnabled(true);
+        setState(() {
+          _biometricEnabled = true;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login biometrik berhasil diaktifkan.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Autentikasi biometrik gagal atau dibatalkan.')),
+          );
+        }
+      }
+    } else {
+      await sl<AuthRepository>().saveBiometricEnabled(false);
+      setState(() {
+        _biometricEnabled = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login biometrik dinonaktifkan.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +191,11 @@ class AccountPage extends StatelessWidget {
                               tone: 'violet',
                               title: 'Login biometrik',
                               subtitle: 'Sidik jari',
-                              onTap: () {},
-                              right: _Toggle(),
+                              onTap: () => _toggleBiometric(!_biometricEnabled),
+                              right: _Toggle(
+                                value: _biometricEnabled,
+                                onChanged: _toggleBiometric,
+                              ),
                             ),
                           ],
                         ),
@@ -273,28 +335,27 @@ class _Row extends StatelessWidget {
   }
 }
 
-class _Toggle extends StatefulWidget {
-  @override
-  State<_Toggle> createState() => _ToggleState();
-}
+class _Toggle extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
-class _ToggleState extends State<_Toggle> {
-  bool _on = true;
+  const _Toggle({required this.value, required this.onChanged});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => setState(() => _on = !_on),
+      onTap: () => onChanged(!value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: 44,
         height: 26,
         decoration: BoxDecoration(
-          color: _on ? AppColors.green : AppColors.line,
+          color: value ? AppColors.green : AppColors.line,
           borderRadius: BorderRadius.circular(20),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 180),
-          alignment: _on ? Alignment.centerRight : Alignment.centerLeft,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             margin: const EdgeInsets.all(3),
             width: 20,

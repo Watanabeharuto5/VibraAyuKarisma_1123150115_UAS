@@ -104,4 +104,10 @@ class AuthRepositoryImpl implements AuthRepository {
     if (json == null) return null;
     return UserModel.fromJsonString(json);
   }
+
+  @override
+  Future<void> saveBiometricEnabled(bool enabled) => _local.saveBiometricEnabled(enabled);
+
+  @override
+  Future<bool> isBiometricEnabled() => _local.getBiometricEnabled();
 }
