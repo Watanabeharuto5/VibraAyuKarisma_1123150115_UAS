@@ -288,10 +288,6 @@ flutter run
 
 - **[Link Presentasi Youtube]([https://youtube.com/](https://www.youtube.com/watch?v=rwtJSPoUn_Q))** — Presentasi Youtube Fibra Cuantek _ 
 
-- **[Link Presentasi Youtube](https://www.youtube.com/watch?v=rwtJSPoUn_Q)** — Presentasi Youtube Fibra Cuantek _ 
-
-- **[Link Presentasi Youtube](https://www.youtube.com/watch?v=rwtJSPoUn_Q)** — Presentasi Youtube pibra Cuantek _ 
-
 # UI Aplikasi Dompet ku & K-Pop Albums
 
 * Tampilan ketika aplikasi berjalan
