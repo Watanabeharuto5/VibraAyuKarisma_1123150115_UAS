@@ -285,7 +285,11 @@ flutter run
 
 - **[Aplikasi Kantong Ku](https://github.com/Watanabeharuto5/VibraAyuKarisma_1123150115_UAS.git)** — Aplikasi Emoney Kantong Ku
 
+
 - **[Link Presentasi Youtube]([https://youtube.com/](https://www.youtube.com/watch?v=rwtJSPoUn_Q))** — Presentasi Youtube Fibra Cuantek _ 
+
+- **[Link Presentasi Youtube](https://www.youtube.com/watch?v=rwtJSPoUn_Q)** — Presentasi Youtube Fibra Cuantek _ 
+
 
 # UI Aplikasi Dompet ku & K-Pop Albums
 
